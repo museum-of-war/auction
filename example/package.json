@@ -1,0 +1,15 @@
+{
+  "name": "@museum-of-war/auction-example",
+  "version": "1.0.0-beta.0",
+  "license": "UNLICENSED",
+  "source": "index.html",
+  "scripts": {
+    "build": "parcel build",
+    "start": "parcel --open"
+  },
+  "dependencies": {
+    "@museum-of-war/auction": "*",
+    "ethers": "^5.6.2",
+    "parcel": "^2.4.1"
+  }
+}

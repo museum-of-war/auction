@@ -16,6 +16,8 @@ module.exports = {
     ecmaVersion: 12,
   },
   rules: {
+    "node/no-missing-import": ["warn"],
+    "node/no-unpublished-import": ["warn"],
     "node/no-unsupported-features/es-syntax": [
       "warn",
       { ignores: ["modules"] },

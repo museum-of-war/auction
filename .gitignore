@@ -3,6 +3,8 @@ node_modules
 coverage
 coverage.json
 typechain
+example/yarn.lock
+.parcel-cache
 
 #Hardhat files
 cache

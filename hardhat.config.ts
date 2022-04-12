@@ -7,6 +7,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-deploy";
+import { accounts, nodeUrl } from "./utils/network";
 
 dotenv.config();
 
@@ -43,6 +44,12 @@ const config: HardhatUserConfig = {
     carol: 3,
   },
   networks: {
+    staging: {
+      url: nodeUrl("rinkeby"),
+      accounts: accounts("rinkeby"),
+      saveDeployments: true,
+      tags: ["staging"],
+    },
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts:

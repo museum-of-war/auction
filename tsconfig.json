@@ -9,5 +9,5 @@
     "types": ["@nomiclabs/hardhat-ethers", "@nomiclabs/hardhat-waffle"]
   },
   "include": ["./test", "./scripts", "./typechain"],
-  "files": ["./hardhat.config.ts"]
+  "files": ["index.ts", "hardhat.config.ts"]
 }
