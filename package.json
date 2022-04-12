@@ -1,6 +1,6 @@
 {
   "name": "@museum-of-war/auction",
-  "version": "1.0.0-beta.10",
+  "version": "1.0.0-beta.11",
   "license": "UNLICENSED",
   "keywords": [
     "ethereum"
@@ -11,6 +11,8 @@
     "node": ">=16"
   },
   "scripts": {
+    "verify-staging": "npx hardhat verify --network staging",
+    "deploy-staging": "hardhat run --network staging scripts/deploy.ts",
     "clean": "npx hardhat clean && rm -rf dist",
     "release": "yarn build && yarn version --prerelease && yarn package && yarn publish --non-interactive --access public ./dist",
     "package": "json-mask 'name,version,license,description,repository,main,types,dependencies,keywords' package.json > dist/package.json && cp readme.md dist/readme.md",
