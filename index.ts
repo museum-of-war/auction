@@ -3,7 +3,7 @@ import { Provider } from "@ethersproject/providers";
 // eslint-disable-next-line camelcase,node/no-missing-import
 import { NFTAuction, NFTAuction__factory } from "./typechain";
 // @ts-ignore
-import rinkeby from "./network/rinkeby-farm.json";
+import rinkeby from "./network/rinkeby.json";
 
 function NFTAuctionAddress(chainName: string) {
   switch (chainName) {
