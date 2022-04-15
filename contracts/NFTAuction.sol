@@ -4,11 +4,14 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/IWithBalance.sol";
 
 /// @title An Auction Contract for bidding and selling single and batched NFTs
 /// @author Avo Labs GmbH
 /// @notice This contract can be used for auctioning any NFTs, and accepts any ERC20 token as payment
-contract NFTAuction {
+contract NFTAuction is Ownable {
+    address[] public whitelistedPassCollections; //Only owners of tokens from any of these collections can make bids
     mapping(address => mapping(uint256 => Auction)) public nftContractAuctions;
     mapping(address => uint256) failedTransferCredits;
     //Each Auction is unique to each NFT (contract + id pairing).
@@ -133,6 +136,20 @@ contract NFTAuction {
     /*╔═════════════════════════════╗
       ║          MODIFIERS          ║
       ╚═════════════════════════════╝*/
+
+    modifier hasWhitelistedToken() {
+        { //Block scoping to prevent "Stack too deep"
+            bool isWhitelisted;
+            for (uint256 i = 0; i < whitelistedPassCollections.length; i++) {
+                if(IWithBalance(whitelistedPassCollections[i]).balanceOf(msg.sender) > 0) {
+                    isWhitelisted = true;
+                    break;
+                }
+            }
+            require(isWhitelisted, "Sender has no whitelisted NFTs");
+        }
+        _;
+    }
 
     modifier isAuctionNotStartedByOwner(
         address _nftContractAddress,
@@ -322,13 +339,46 @@ contract NFTAuction {
       ╚═════════════════════════════╝*/
     /**********************************/
     // constructor
-    constructor() {
+    constructor(address[] memory _whitelistedPassCollectionsAddresses) {
         defaultBidIncreasePercentage = 100;
         defaultAuctionBidPeriod = 86400; //1 day
         minimumSettableIncreasePercentage = 100;
         maximumMinPricePercentage = 8000;
-    }
 
+        uint256 collectionsCount = _whitelistedPassCollectionsAddresses.length;
+        for (uint256 i = 0; i < collectionsCount; i++) {
+            whitelistedPassCollections.push(_whitelistedPassCollectionsAddresses[i]);
+        }
+    }
+    /**********************************/
+    /*╔══════════════════════════════╗
+      ║     WHITELIST FUNCTIONS      ║
+      ╚══════════════════════════════╝*/
+    /*
+     * Add whitelisted pass collection.
+     */
+    function addWhitelistedCollection(address _collectionContractAddress)
+    external
+    onlyOwner
+    {
+        whitelistedPassCollections.push(_collectionContractAddress);
+    }
+    /*
+     * Remove whitelisted pass collection by index.
+     */
+    function removeWhitelistedCollection(uint256 index)
+    external
+    onlyOwner
+    {
+        whitelistedPassCollections[index] = whitelistedPassCollections[whitelistedPassCollections.length - 1];
+        whitelistedPassCollections.pop();
+    }
+    /**********************************/
+    /*╔══════════════════════════════╗
+      ║             END              ║
+      ║     WHITELIST FUNCTIONS      ║
+      ╚══════════════════════════════╝*/
+    /**********************************/
     /*╔══════════════════════════════╗
       ║    AUCTION CHECK FUNCTIONS   ║
       ╚══════════════════════════════╝*/
@@ -891,6 +941,7 @@ contract NFTAuction {
         uint128 _tokenAmount
     )
         internal
+        hasWhitelistedToken
         notNftSeller(_nftContractAddress, _tokenId)
         paymentAccepted(
             _nftContractAddress,
