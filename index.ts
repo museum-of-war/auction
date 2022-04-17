@@ -25,4 +25,14 @@ function NFTAuctionConnect(
   ) as NFTAuction;
 }
 
-export { NFTAuctionConnect };
+function NFTAuctionConnectByAddress(
+  signerOrProvider: Signer | Provider,
+  address: string
+): NFTAuction {
+  return NFTAuction__factory.connect(
+    address,
+    signerOrProvider
+  ) as NFTAuction;
+}
+
+export { NFTAuctionConnect, NFTAuctionConnectByAddress };
