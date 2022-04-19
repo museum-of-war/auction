@@ -2,14 +2,18 @@ import { Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 // eslint-disable-next-line camelcase,node/no-missing-import
 import { NFTAuction, NFTAuction__factory } from "./typechain";
-// @ts-ignore
 import rinkeby from "./network/rinkeby.json";
+import mainnet from "./network/mainnet.json";
 
 function NFTAuctionAddress(chainName: string) {
   switch (chainName) {
     case "stage":
     case "rinkeby":
       return rinkeby.NFTAuction;
+    case "prod":
+    case "production":
+    case "mainnet":
+      return mainnet.NFTAuction;
     default:
       throw new Error(`Chain "${chainName}" not exist`);
   }
@@ -29,10 +33,7 @@ function NFTAuctionConnectByAddress(
   signerOrProvider: Signer | Provider,
   address: string
 ): NFTAuction {
-  return NFTAuction__factory.connect(
-    address,
-    signerOrProvider
-  ) as NFTAuction;
+  return NFTAuction__factory.connect(address, signerOrProvider) as NFTAuction;
 }
 
 export { NFTAuctionConnect, NFTAuctionConnectByAddress };

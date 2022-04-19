@@ -5,6 +5,7 @@ coverage.json
 typechain
 example/yarn.lock
 .parcel-cache
+dist
 
 #Hardhat files
 cache
