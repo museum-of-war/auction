@@ -375,6 +375,10 @@ contract NFTAuctionV2 is Ownable {
         )
     {
         require(msg.sender == tx.origin, "Sender must be a wallet");
+        require(
+            nftContractAuctions[_nftContractAddress][_tokenId].feeRecipient != address(0),
+            "Auction does not exist"
+        );
 
         // Reverse previous bid and update highest bid:
         address prevNftHighestBidder = nftContractAuctions[_nftContractAddress][_tokenId].nftHighestBidder;
