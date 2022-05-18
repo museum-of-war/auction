@@ -213,14 +213,17 @@ contract NFTAuctionV2 is Ownable {
         address _nftContractAddress,
         uint256 _tokenId
     ) internal view returns (bool) {
-        //if the NFT is up for auction, the bid needs to be a % higher than the previous bid
-        uint256 bidIncreaseAmount = (nftContractAuctions[_nftContractAddress][
-            _tokenId
-        ].nftHighestBid *
+        uint256 highestBid = nftContractAuctions[_nftContractAddress][_tokenId].nftHighestBid;
+        if (highestBid > 0) {
+            //if the NFT is up for auction, the bid needs to be a % higher than the previous bid
+            uint256 bidIncreaseAmount = (highestBid *
             (10000 +
-                _getBidIncreasePercentage(_nftContractAddress, _tokenId))) /
+            _getBidIncreasePercentage(_nftContractAddress, _tokenId))) /
             10000;
-        return msg.value >= bidIncreaseAmount;
+            return msg.value >= bidIncreaseAmount;
+        } else {
+            return msg.value >= nftContractAuctions[_nftContractAddress][_tokenId].minPrice;
+        }
     }
 
     /**********************************/

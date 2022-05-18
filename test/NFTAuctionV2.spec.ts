@@ -103,6 +103,14 @@ describe("NFTAuctionV2", function () {
 
     const balanceBefore = await feeReceiver.getBalance();
 
+    await expect(
+      auction
+        .connect(buyer)
+        .makeBid(auctionCollection.address, auctionTokenId, {
+          value: ethers.constants.WeiPerEther.div(10),
+        })
+    ).to.be.revertedWith("Not enough funds to bid on NFT");
+
     await auction
       .connect(buyer)
       .makeBid(auctionCollection.address, auctionTokenId, {
