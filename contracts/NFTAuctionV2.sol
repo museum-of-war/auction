@@ -471,7 +471,8 @@ contract NFTAuctionV2 is Ownable {
     {
         for (uint256 i = 0; i < _tokenIds.length; i++) {
             uint256 _tokenId = _tokenIds[i];
-            if (!_isAuctionOngoing(_nftContractAddress, _tokenId)) {
+            address _nftHighestBidder = nftContractAuctions[_nftContractAddress][_tokenId].nftHighestBidder;
+            if (!_isAuctionOngoing(_nftContractAddress, _tokenId) && _nftHighestBidder != address(0)) {
                 _transferNftAndPaySeller(_nftContractAddress, _tokenId);
                 emit AuctionSettled(_nftContractAddress, _tokenId);
             }
@@ -485,9 +486,11 @@ contract NFTAuctionV2 is Ownable {
         for (uint256 i = 0; i < _tokenIds.length; i++) {
             uint256 _tokenId = _tokenIds[i];
             address _nftHighestBidder = nftContractAuctions[_nftContractAddress][_tokenId].nftHighestBidder;
-            uint128 _nftHighestBid = nftContractAuctions[_nftContractAddress][_tokenId].nftHighestBid;
+            if (_nftHighestBidder != address(0)) {
+                uint128 _nftHighestBid = nftContractAuctions[_nftContractAddress][_tokenId].nftHighestBid;
+                _payout(_nftHighestBidder, _nftHighestBid);
+            }
             delete nftContractAuctions[_nftContractAddress][_tokenId];
-            _payout(_nftHighestBidder, _nftHighestBid);
             IERC721(_nftContractAddress).transferFrom(
                 address(this),
                 owner(),
