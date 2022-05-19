@@ -38,8 +38,7 @@ function NFTAuctionAddress(chainName: string, version = AuctionVersion.V1) {
         case "prod":
         case "production":
         case "mainnet":
-          throw new Error(`Not deployed to ${chainName} yet`);
-          // return mainnet.NFTAuctionV2;
+          return mainnet.NFTAuctionV2;
         default:
           throw new Error(`Chain "${chainName}" not exist`);
       }
