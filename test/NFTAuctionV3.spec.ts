@@ -47,6 +47,10 @@ describe("NFTAuctionV3", function () {
         })
     ).to.be.revertedWith("Not enough funds to bid on NFT");
 
+    await expect(
+      auction.connect(buyer).withdrawAllFailedCreditsOf(buyer.address)
+    ).to.be.revertedWith("no credits to withdraw");
+
     await auction
       .connect(buyer)
       .makeBid(auctionCollection.address, auctionTokenId, {
@@ -139,6 +143,24 @@ describe("NFTAuctionV3", function () {
         })
     ).to.be.revertedWith("Auction has ended");
 
+    const newEnd = timeEnd + 86400;
+
+    await auction.updateAuctionsEnd(
+      auctionCollection.address,
+      [auctionTokenId],
+      newEnd
+    );
+
+    const lastPrice = price.mul(2);
+
+    await auction
+      .connect(buyer)
+      .makeBid(auctionCollection.address, auctionTokenId, {
+        value: lastPrice,
+      });
+
+    await ethers.provider.send("evm_mine", [newEnd]);
+
     await auction.settleAuctions(auctionCollection.address, [auctionTokenId]);
 
     expect(await auctionCollection.ownerOf(auctionTokenId)).to.be.equal(
@@ -147,13 +169,13 @@ describe("NFTAuctionV3", function () {
 
     const balanceAfter = await feeReceiver.getBalance();
 
-    expect(balanceAfter.sub(balanceBefore)).to.be.deep.equal(price);
+    expect(balanceAfter.sub(balanceBefore)).to.be.deep.equal(lastPrice);
 
     await expect(
       auction
         .connect(buyer)
         .makeBid(auctionCollection.address, auctionTokenId, {
-          value: price,
+          value: lastPrice,
         })
     ).to.be.revertedWith("Auction does not exist");
   });
