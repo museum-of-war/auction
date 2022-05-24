@@ -8,12 +8,12 @@ npm install @museum-of-war/auction
 
 ```typescript
 import { ethers } from "ethers";
-import { NFTAuctionConnect } from "@museum-of-war/auction";
+import { AuctionVersion, NFTAuctionConnect } from "@museum-of-war/auction";
 
 async function main() {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   await provider.send("eth_requestAccounts", []);
-  const auction = NFTAuctionConnect(provider, "rinkeby");
+  const auction = NFTAuctionConnect(provider, "rinkeby", AuctionVersion.V3);
   console.log(auction.address);
 }
 

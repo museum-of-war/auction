@@ -85,14 +85,8 @@ contract NFTAuctionV3 is Ownable {
       ╚═════════════════════════════╝*/
 
     modifier auctionOngoing(address _nftContractAddress, uint256 _tokenId) {
-        require(
-            _isAuctionStarted(_nftContractAddress, _tokenId),
-            "Auction has not started"
-        );
-        require(
-            _isAuctionOngoing(_nftContractAddress, _tokenId),
-            "Auction has ended"
-        );
+        require(_isAuctionStarted(_nftContractAddress, _tokenId), "Auction has not started");
+        require(_isAuctionOngoing(_nftContractAddress, _tokenId), "Auction has ended");
         _;
     }
 
@@ -101,10 +95,7 @@ contract NFTAuctionV3 is Ownable {
      * bid by the specified bid increase percentage.
      */
     modifier bidAmountMeetsBidRequirements(address _nftContractAddress, uint256 _tokenId) {
-        require(
-            _doesBidMeetBidRequirements(_nftContractAddress, _tokenId),
-            "Not enough funds to bid on NFT"
-        );
+        require(_doesBidMeetBidRequirements(_nftContractAddress, _tokenId), "Not enough funds to bid on NFT");
         _;
     }
 
@@ -133,8 +124,7 @@ contract NFTAuctionV3 is Ownable {
         uint64 auctionEndTimestamp = nftContractAuctions[_nftContractAddress][_tokenId].auctionEnd;
         //if the auctionEnd is set to 0, the auction is technically on-going, however
         //the minimum bid price (minPrice) has not yet been met.
-        return (auctionEndTimestamp == 0 ||
-            block.timestamp < auctionEndTimestamp);
+        return (auctionEndTimestamp == 0 || block.timestamp < auctionEndTimestamp);
     }
 
     /*
@@ -146,8 +136,7 @@ contract NFTAuctionV3 is Ownable {
         if (highestBid > 0) {
             //if the NFT is up for auction, the bid needs to be a % higher than the previous bid
             uint256 bidIncreaseAmount = (highestBid *
-            (10000 + nftContractAuctions[_nftContractAddress][_tokenId].bidIncreasePercentage)) /
-            10000;
+                (10000 + nftContractAuctions[_nftContractAddress][_tokenId].bidIncreasePercentage)) / 10000;
             return msg.value >= bidIncreaseAmount;
         } else {
             return msg.value >= nftContractAuctions[_nftContractAddress][_tokenId].minPrice;
@@ -202,16 +191,9 @@ contract NFTAuctionV3 is Ownable {
             }
             // Sending the NFT to this contract
             if (IERC721(_nftContractAddress).ownerOf(_tokenId) == msg.sender) {
-                IERC721(_nftContractAddress).transferFrom(
-                    msg.sender,
-                    address(this),
-                    _tokenId
-                );
+                IERC721(_nftContractAddress).transferFrom(msg.sender, address(this), _tokenId);
             }
-            require(
-                IERC721(_nftContractAddress).ownerOf(_tokenId) == address(this),
-                "NFT transfer failed"
-            );
+            require( IERC721(_nftContractAddress).ownerOf(_tokenId) == address(this), "NFT transfer failed");
 
             emit NftAuctionCreated(
                 _nftContractAddress,
@@ -242,11 +224,7 @@ contract NFTAuctionV3 is Ownable {
                 "Auction is not created"
             );
             nftContractAuctions[_nftContractAddress][_tokenId].auctionEnd = _auctionEnd;
-            emit AuctionPeriodUpdated(
-                _nftContractAddress,
-                _tokenId,
-                _auctionEnd
-            );
+            emit AuctionPeriodUpdated(_nftContractAddress, _tokenId, _auctionEnd);
         }
     }
     /**********************************/
@@ -288,17 +266,13 @@ contract NFTAuctionV3 is Ownable {
             _payout(prevNftHighestBidder, prevNftHighestBid);
         }
 
-        emit BidMade(
-            _nftContractAddress,
-            _tokenId,
-            msg.sender,
-            msg.value
-        );
+        emit BidMade(_nftContractAddress, _tokenId, msg.sender, msg.value);
 
         // Update auction end if needed:
         if (nftContractAuctions[_nftContractAddress][_tokenId].auctionBidPeriod > 0) {
             //the auction end is set to now + the bid period (if it is greater than the previous one)
-            uint64 newEnd = nftContractAuctions[_nftContractAddress][_tokenId].auctionBidPeriod + uint64(block.timestamp);
+            uint64 newEnd = nftContractAuctions[_nftContractAddress][_tokenId].auctionBidPeriod +
+                uint64(block.timestamp);
             if (newEnd > nftContractAuctions[_nftContractAddress][_tokenId].auctionEnd) {
                 nftContractAuctions[_nftContractAddress][_tokenId].auctionEnd = newEnd;
                 emit AuctionPeriodUpdated(
@@ -334,19 +308,10 @@ contract NFTAuctionV3 is Ownable {
         nftContractAuctions[_nftContractAddress][_tokenId].nftHighestBid = 0;
 
         _payout(_feeRecipient, _nftHighestBid);
-        IERC721(_nftContractAddress).transferFrom(
-            address(this),
-            _nftHighestBidder,
-            _tokenId
-        );
+        IERC721(_nftContractAddress).transferFrom(address(this), _nftHighestBidder, _tokenId);
 
         delete nftContractAuctions[_nftContractAddress][_tokenId];
-        emit NFTTransferredAndSellerPaid(
-            _nftContractAddress,
-            _tokenId,
-            _nftHighestBid,
-            _nftHighestBidder
-        );
+        emit NFTTransferredAndSellerPaid(_nftContractAddress, _tokenId, _nftHighestBid, _nftHighestBidder);
     }
 
     /*
@@ -402,11 +367,7 @@ contract NFTAuctionV3 is Ownable {
                 _payout(_nftHighestBidder, _nftHighestBid);
             }
             delete nftContractAuctions[_nftContractAddress][_tokenId];
-            IERC721(_nftContractAddress).transferFrom(
-                address(this),
-                owner(),
-                _tokenId
-            );
+            IERC721(_nftContractAddress).transferFrom(address(this), owner(), _tokenId);
             emit AuctionWithdrawn(_nftContractAddress, _tokenId);
         }
     }
@@ -432,11 +393,7 @@ contract NFTAuctionV3 is Ownable {
                 _transferNftAndPayFeeRecipient(_nftContractAddress, _tokenId);
                 emit HighestBidTaken(_nftContractAddress, _tokenId);
             } else {
-                IERC721(_nftContractAddress).transferFrom(
-                    address(this),
-                    msg.sender,
-                    _tokenId
-                );
+                IERC721(_nftContractAddress).transferFrom(address(this), msg.sender, _tokenId);
                 delete nftContractAuctions[_nftContractAddress][_tokenId];
             }
         }
@@ -452,10 +409,7 @@ contract NFTAuctionV3 is Ownable {
 
         failedTransferCredits[recipient] = 0;
 
-        (bool successfulWithdraw, ) = recipient.call{
-            value: amount,
-            gas: 20000
-        }("");
+        (bool successfulWithdraw, ) = recipient.call{ value: amount, gas: 20000 }("");
         require(successfulWithdraw, "withdraw failed");
     }
 
