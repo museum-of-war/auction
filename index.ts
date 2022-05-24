@@ -54,8 +54,7 @@ function NFTAuctionAddress(chainName: string, version = AuctionVersion.V1) {
         case "prod":
         case "production":
         case "mainnet":
-          throw new Error(`Still not supported in ${chainName}`);
-          // return mainnet.NFTAuctionV3;
+          return mainnet.NFTAuctionV3;
         default:
           throw new Error(`Chain "${chainName}" not exist`);
       }
