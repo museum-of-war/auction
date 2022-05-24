@@ -1,4 +1,4 @@
-# NFTAuctionV3
+# [NFTAuctionV3](/contracts/NFTAuctionV3.sol)
 
 This smart contract can be used in a flexible manner to auction NFTs in a semi-manual way.
 The NFT seller must be the owner of this contract.
@@ -14,7 +14,7 @@ Create an auction for their NFTs and customize their auction by specifying the f
 - Auction start time. Bidders won't be able to make bids before the start time.
 - Auction end time. Bidders won't be able to make bids after the end time. If end time is set to 0, then it will be determined after the first bid as current time + bid period.
 
-# Bidders can perform the following actions using the Unstoppable Auction contract:
+# Bidders can perform the following actions using the NFTAuctionV3 contract:
 
 - Make a bid on an NFT put up for auction by specifying the amount of the bid in ETH. The bidder must make a bid that is higher by the bid increase percentage if another bid has already been made.
 
