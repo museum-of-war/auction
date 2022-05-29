@@ -10,6 +10,9 @@ import {
   NFTAuctionV3,
   // eslint-disable-next-line camelcase
   NFTAuctionV3__factory,
+  NFTSeller,
+  // eslint-disable-next-line camelcase
+  NFTSeller__factory,
 } from "./typechain";
 import rinkeby from "./network/rinkeby.json";
 import mainnet from "./network/mainnet.json";
@@ -18,6 +21,7 @@ enum AuctionVersion {
   V1 = 1,
   V2,
   V3,
+  Seller,
 }
 
 function NFTAuctionAddress(chainName: string, version = AuctionVersion.V1) {
@@ -58,6 +62,19 @@ function NFTAuctionAddress(chainName: string, version = AuctionVersion.V1) {
         default:
           throw new Error(`Chain "${chainName}" not exist`);
       }
+    case AuctionVersion.Seller:
+      switch (chainName) {
+        case "stage":
+        case "rinkeby":
+          return rinkeby.NFTSeller;
+        case "prod":
+        case "production":
+        case "mainnet":
+          throw new Error(`Chain "${chainName}" is not supported yet`);
+          // return mainnet.NFTSeller;
+        default:
+          throw new Error(`Chain "${chainName}" not exist`);
+      }
   }
 }
 
@@ -67,6 +84,8 @@ type VersionToAuction<T extends AuctionVersion> = T extends AuctionVersion.V1
   ? NFTAuctionV2
   : T extends AuctionVersion.V3
   ? NFTAuctionV3
+  : T extends AuctionVersion.Seller
+  ? NFTSeller
   : never;
 
 function NFTAuctionConnect(
@@ -102,6 +121,8 @@ function NFTAuctionConnectByAddress(
         address,
         signerOrProvider
       ) as NFTAuctionV3;
+    case AuctionVersion.Seller:
+      return NFTSeller__factory.connect(address, signerOrProvider) as NFTSeller;
   }
 }
 
