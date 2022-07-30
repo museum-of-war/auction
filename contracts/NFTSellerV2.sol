@@ -14,7 +14,7 @@ contract NFTSellerV2 is Ownable, IERC721Receiver, IERC1155Receiver {
     address[] public whitelistedPassCollections; //Only owners of tokens from any of these collections can buy if is onlyWhitelisted
     mapping(address => Sale) public nftContractSales;
     mapping(address => uint256) failedTransferCredits;
-    //Each Sale is unique to each NFT (contract + id pairing).
+    //Each Sale is unique to each collection (smart contract).
     struct Sale {
         //map contract address to
         uint64 saleStart;
