@@ -86,8 +86,7 @@ function NFTAuctionAddress(chainName: string, version = AuctionVersion.V1) {
         case "prod":
         case "production":
         case "mainnet":
-          throw new Error(`NFTSellerV2 is not deployed in "${chainName}" yet`);
-        // return mainnet.NFTSellerV2;
+          return mainnet.NFTSellerV2;
         default:
           throw new Error(`Chain "${chainName}" not exist`);
       }
